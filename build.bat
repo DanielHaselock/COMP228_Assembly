@@ -4,13 +4,7 @@ if NOT exist obj (mkdir obj)
 
 if NOT exist exe (mkdir exe)
 
-nasm -f win32 "primeNumber.asm" -o "obj/primeNumber.obj"
+wsl.exe -d Debian bash -i -c "nasm -f elf32 -o obj/primeNumber.o primeNumber.asm && ld -m elf_i386 -o exe/primeNumber obj/primeNumber.o && ./exe/primeNumber"
 
-gcc "obj/primeNumber.obj" -o "exe/primeNumber.exe"
-
-::ld -m i386pe -o exe/primeNumber.exe obj/primeNumber.obj
-
- 
-"exe/primeNumber"
 echo:
 pause
