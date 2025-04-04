@@ -3,29 +3,32 @@ global         _start
 _start:
     mov al, byte [number] ; Load the 8-bit number to check
     mov bl, 2             ; Start divisor at 2
-    mov byte [answer], 1  ; Assume the number is prime initially
+    xor ah, ah            ; Clear ah
+    call check_loop
 
 check_loop:
-    cmp al, bl            ; Compare divisor with the number
-    jle print_prime     ; If divisor >= number, number is prime
-    xor ah, ah            ; Clear ah for division
-    mov al, byte [number] ; Move the number into the lower byte of ax (al)
+    cmp al, bl            ; number - divisor
+    jle checkAndPrint     ; If divisor >= number, number is prime
+    push eax              ; Saves al value to stack
     div bl                ; Divide ax by bl and store quotient in al and remainder in ah
     cmp ah, 0             ; Check if remainder is 0
-    je print_not_prime       ; If remainder is 0, number is not prime
+    je set_notPrime       ; If remainder is 0, number is not prime
+    jmp end_loop
+
+set_notPrime:
+    mov byte [answer], 0  ; Set answer to 0 (not prime)
+    jmp end_loop
+
+end_loop:
     inc bl                ; Increment divisor
+    pop eax               ; retrieve al value from stack
     jmp check_loop        ; Repeat the loop
 
 ; print statements
-
-; set_notPrime:
-;     mov byte [answer], 0  ; Set answer to 0 (not prime)
-;     jmp check_loop        ; Return to the loop
-
-; checkAndPrint:
-;     cmp byte [answer], 0   ; Check if answer is 0 (not prime)
-;     je print_not_prime     ; If not prime, print not prime message
-;     jmp print_prime        ; Else, print prime message
+checkAndPrint:
+    cmp byte [answer], 0   ; Check if answer is 0 (not prime)
+    je print_not_prime     ; If not prime, print not prime message
+    jmp print_prime        ; Else, print prime message
 
 print_not_prime:
     mov eax, 4             ; syscall: sys_write
@@ -52,7 +55,7 @@ print_prime:
 
     section        .data       
 
-    number db 97 ; input value
+    number db 107 ; input value
     answer db 1 ; 1 means number is prime,
     ; 0 means number is not prime   
 
